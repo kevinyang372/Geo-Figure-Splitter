@@ -11,15 +11,21 @@ class geoiter:
         self.resolution = resolution
         self.zoom = zoom
         
+        # pre-compute the locations of each image
         self.pre_computed_imgs = self._map_tiler(bounds[0], bounds[1], bounds[2], bounds[3], zoom, resolution)
         
     def __iter__(self):
+
+        # initialize the iterator
         self.count = 0
         return self
     
     def __next__(self):
+
         if self.count < len(self.pre_computed_imgs):
             current_block = self.pre_computed_imgs[self.count]
+
+            # return the image with the pre-computed location
             img = self._img_with_given_resolution(current_block[0], current_block[1], self.zoom)
             self.count += 1
             
@@ -27,6 +33,7 @@ class geoiter:
         else:
             raise StopIteration
         
+    # convert lat/lng to tiles
     def _geo_converter(self, lat_deg, lon_deg, zoom):
         lat_rad = math.radians(lat_deg)
         n = 2.0 ** zoom
@@ -34,6 +41,7 @@ class geoiter:
         ytile = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
         return (xtile, ytile)
         
+    # check whether the current resolution could be met    
     def _check_resolution(self, xtile1, ytile1, xtile2, ytile2, zoom, resolution):
     
         len_x = abs(xtile1 - xtile2) * 256
@@ -51,6 +59,7 @@ class geoiter:
 
         return math.floor(multiplier_x), math.floor(multiplier_y)
     
+    # find the tiles and crop location of a given image
     def _find_tile(self, top_left, bottom_right, outer_top_left):
     
         x = bottom_right[0] - top_left[0]
@@ -70,6 +79,7 @@ class geoiter:
 
         return tiles, crop
     
+    # compute the tile location for each image
     def _map_tiler(self, lat1, lng1, lat2, lng2, zoom, resolution):
     
         xtile1, ytile1 = self._geo_converter(lat1, lng1, zoom)
@@ -100,6 +110,7 @@ class geoiter:
 
         return pre_computed_imgs
     
+    # return an image with the given tile location
     def _img_with_given_resolution(self, tiles, crop, zoom):
     
         responses = []
