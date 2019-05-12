@@ -24,7 +24,7 @@ class geoiter:
             raise Exception("Zoom level bigger than 19 or smaller than 0")
 
         self.zoom = zoom
-        
+
         # pre-compute the locations of each image
         self.pre_computed_imgs = self._map_tiler(bounds[0], bounds[1], bounds[2], bounds[3], zoom, resolution)
         
@@ -91,6 +91,9 @@ class geoiter:
     
         xtile1, ytile1 = self._geo_converter(lat1, lng1, zoom)
         xtile2, ytile2 = self._geo_converter(lat2, lng2, zoom)
+        
+        self._check_tile_convertion_integrity(xtile1, ytile1, zoom)
+        self._check_tile_convertion_integrity(xtile2, ytile2, zoom)
 
         mp_x, mp_y = self._check_resolution(xtile1, ytile1, xtile2, ytile2, zoom, resolution)
 
@@ -150,3 +153,11 @@ class geoiter:
         new_im = new_im.crop(crop)
 
         return new_im
+    
+    def _check_tile_convertion_integrity(self, xtile, ytile, zoom):
+        
+        tile_size = 2 ** zoom - 1
+        
+        if xtile > tile_size or xtile < 0 or ytile > tile_size or ytile < 0:
+            raise Exception("Tile convertion error. Please refer to https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Zoom_levels for proper lat/lng range with given zoom level")
+        
