@@ -76,8 +76,6 @@ class geoiter:
 
         distance_from_bottom_x = outer_bottom_right[0] - math.ceil(bottom_right[0] / 256) + 1
         distance_from_bottom_y = outer_bottom_right[1] - math.ceil(bottom_right[1] / 256) + 1
-        
-        print(distance_from_bottom_y)
 
         tiles = (outer_top_left[0] + distance_from_top_x, outer_top_left[1] + distance_from_top_y, 
                  outer_bottom_right[0] - distance_from_bottom_x, outer_bottom_right[1] - distance_from_bottom_y)
