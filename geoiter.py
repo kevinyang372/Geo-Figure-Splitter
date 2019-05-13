@@ -5,7 +5,7 @@ import math
 
 class geoiter:
     
-    def __init__(self, bounds, resolution, zoom):
+    def __init__(self, bounds, resolution, zoom = None):
 
         if abs(bounds[0]) >= 90 or abs(bounds[2]) >= 90:
             raise Exception("Latitude bigger than 90 or smaller than -90")
@@ -19,13 +19,15 @@ class geoiter:
 
         self.resolution = resolution
 
-        if zoom < 0 or zoom > 19:
+        if zoom is None:
+            self.zoom = self._minimum_resolution(bounds, resolution)
+        elif zoom < 0 or zoom > 19:
             raise Exception("Zoom level bigger than 19 or smaller than 0")
-
-        self.zoom = zoom
+        else:
+            self.zoom = zoom
 
         # pre-compute the locations of each image
-        self.pre_computed_imgs = self._map_tiler(bounds[0], bounds[1], bounds[2], bounds[3], zoom, resolution)
+        self.pre_computed_imgs = self._map_tiler(bounds[0], bounds[1], bounds[2], bounds[3], self.zoom, resolution)
         
     def __iter__(self):
         self.count = 0
@@ -64,6 +66,21 @@ class geoiter:
             raise Exception("Unable to meet the set resolution requirement with given zoom level. Recommended Minimum Zoom Level: %s" % (zoom + multiplier))
 
         return math.floor(multiplier_x), math.floor(multiplier_y)
+
+    def _minimum_resolution(self, boundary, resolution):
+
+        for i in range(20):
+
+            xtile1, ytile1 = self._geo_converter(boundary[0], boundary[1], i)
+            xtile2, ytile2 = self._geo_converter(boundary[2], boundary[3], i)
+
+            x = abs(xtile2 - xtile1) * 256
+            y = abs(ytile2 - ytile1) * 256
+
+            if x > resolution[0] and y > resolution[1]:
+                return i
+    
+        raise Exception("Impossible to return an image with given resolution under the defined boundary.")
     
     def _find_tile(self, top_left, bottom_right, outer_top_left, outer_bottom_right):
     
