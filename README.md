@@ -1,4 +1,4 @@
-# Geo-Figure-Splitter
+# Geoiter
 
 Geoiter is a python library that yields a sequence of images that tiles given geographic bounds with a specific resolution and zoom level. All the images returned in the library is built upon [the OpenStreetMap standard tile server database](https://wiki.openstreetmap.org/wiki/Slippy_Map)
 
@@ -38,7 +38,7 @@ Geoiter accepts three parameters as the input to the iterator
 
 * __zoom__ (optional): an integer referring to the zoom level of the output image (when it is not provided, the algorithm will automatically compute and use the minimum zoom level necessary)
 
-## How It Works
+## Basic Ideas
 
 ### Map Tiling
 
@@ -72,6 +72,10 @@ Since each tile has the size of 256 * 256, the boundary could be represented wit
 
 > _Notice that if either `abs(xtile1 - xtile2) * 256` is smaller than the resolution width or `abs(ytile1 - ytile2) * 256` is smaller than the resolution height. This will trigger an Exception returned by the iterator_
 
-Mathematically, if the resolution is defined by (a0, a1), the geographic boundary will be divided into
+Mathematically, if the resolution is defined by (a0, a1), the geographic boundary could be divided into
 * `abs(xtile1 - xtile2) * 256 // a0` in x-axis
-* `abs(ytile1 - ytile2) * 256 // a1` in x-axis
+* `abs(ytile1 - ytile2) * 256 // a1` in y-axis
+
+### Assembling and Cropping
+
+Knowing how many images could be produced within the geographic boundary, the algorithm then computes the tiles that 'wrap' each image, assembles them together and then crops the desired image out.
