@@ -2,6 +2,17 @@
 
 Geoiter is a python library that yields a sequence of images that tiles given geographic bounds with a specific resolution and zoom level. All the images returned in the library is built upon [the OpenStreetMap standard tile server database](https://wiki.openstreetmap.org/wiki/Slippy_Map)
 
+## Setup
+
+Geoiter is built under python3. All the dependencies could be installed by:
+```bash
+pip install -r requirements.txt
+```
+Run all the unit test to see if the library is performing correctly by:
+```bash
+python -m unittest discover -v
+```
+
 ## Example Usage
 
 Geoiter is a python iterator object which continues generating images until it finished tiling the entire boundary
@@ -16,8 +27,16 @@ for image in geoiter(bounds, resolution, zoom):
     print(image)
 ```
 
-The first output from the iterator will represent the starting point (31.2304, 121.4737) with resolution of 640 * 480:
-![image](https://user-images.githubusercontent.com/30107576/57580216-88998b00-74d9-11e9-9203-c626494dc532.png)
+## Documentation
+
+Geoiter accepts three parameters as the input to the iterator
+* __bounds__: a pair of latitude and longitudes - `format: (lat1, lng1, lat2, lng2)`
+
+
+* __resolution__: the resolution of the output image in pixels - `format: (resolution_x, resolution_y)`
+
+
+* __zoom__ (optional): an integer referring to the zoom level of the output image (when it is not provided, the algorithm will automatically compute and use the minimum zoom level necessary)
 
 ## How It Works
 
