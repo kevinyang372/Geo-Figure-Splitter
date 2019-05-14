@@ -5,7 +5,7 @@ import math
 
 class geoiter:
     
-    def __init__(self, bounds, resolution, zoom = None):
+    def __init__(self, bounds, resolution, zoom = None, include_boundary = False):
 
         # verify if the geoinformation is valid
         if abs(bounds[0]) >= 90 or abs(bounds[2]) >= 90:
@@ -30,7 +30,7 @@ class geoiter:
             self.zoom = zoom
 
         # pre-compute the locations of each image
-        self.pre_computed_imgs = self._map_tiler(bounds[0], bounds[1], bounds[2], bounds[3], self.zoom, resolution)
+        self.pre_computed_imgs = self._map_tiler(bounds[0], bounds[1], bounds[2], bounds[3], self.zoom, resolution, include_boundary)
         
     def __iter__(self):
 
@@ -59,7 +59,7 @@ class geoiter:
         return (xtile, ytile)
         
     # check if images with the resolution could be processed under given boundary and zoom level
-    def _check_resolution(self, xtile1, ytile1, xtile2, ytile2, zoom, resolution):
+    def _check_resolution(self, xtile1, ytile1, xtile2, ytile2, zoom, resolution, include_boundary):
     
         len_x = (abs(xtile1 - xtile2) + 1) * 256
         len_y = (abs(ytile1 - ytile2) + 1) * 256
@@ -74,7 +74,10 @@ class geoiter:
             multiplier = math.ceil(math.log(1 / min(multiplier_x, multiplier_y), 2)) + 1
             raise Exception("Unable to meet the set resolution requirement with given zoom level. Recommended Minimum Zoom Level: %s" % (zoom + multiplier))
 
-        return math.floor(multiplier_x), math.floor(multiplier_y)
+        if not include_boundary:
+            return math.floor(multiplier_x), math.floor(multiplier_y)
+        else:
+            return math.ceil(multiplier_x), math.ceil(multiplier_y)
 
     # return the minimum zoom level required to satisfy the given resolution
     def _minimum_zoom(self, boundary, resolution):
@@ -118,7 +121,7 @@ class geoiter:
         return tiles, crop
     
     # core function that returns the pre-computed information of each image
-    def _map_tiler(self, lat1, lng1, lat2, lng2, zoom, resolution):
+    def _map_tiler(self, lat1, lng1, lat2, lng2, zoom, resolution, include_boundary):
     
         # gets the boundary within tile system
         xtile1, ytile1 = self._geo_converter(lat1, lng1, zoom)
@@ -131,7 +134,7 @@ class geoiter:
         # mp_x represents how many pieces of the image will be on the x-axis
         # mp_y represents how many pieces of the image will be on the y-axis
         # the total number of images returned is mp_x * mp_y
-        mp_x, mp_y = self._check_resolution(xtile1, ytile1, xtile2, ytile2, zoom, resolution)
+        mp_x, mp_y = self._check_resolution(xtile1, ytile1, xtile2, ytile2, zoom, resolution, include_boundary)
 
         # upper_left represents the top left corner of the boundary
         # bottom_right represents the bottom right corner of the boundary

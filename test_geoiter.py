@@ -75,5 +75,16 @@ class GeoiterTestCase(unittest.TestCase):
 
         self.assertTrue("Impossible to return an image with given resolution under the defined boundary" in str(context.exception))
 
+    # test include boundary functionality
+    def test_with_include_boundary(self):
+        bounds = (31.2304, 121.4737, 35.6762, 139.6503)
+        resolution = (1280, 760)
+        zoom = 8
+
+        test = geoiter(bounds, resolution, zoom, True)
+
+        self.assertEqual(len(test.pre_computed_imgs), 6)
+
+
 if __name__ == '__main__':
     unittest.main()
