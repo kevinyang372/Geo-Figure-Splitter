@@ -29,7 +29,7 @@ for image in geoiter(bounds, resolution, zoom):
 
 ## Documentation
 
-Geoiter accepts three parameters as the input to the iterator
+Geoiter accepts four parameters as the input to the iterator
 * __bounds__: a pair of latitude and longitudes - `format: (lat1, lng1, lat2, lng2)`
 
 
@@ -37,6 +37,8 @@ Geoiter accepts three parameters as the input to the iterator
 
 
 * __zoom__ (optional): an integer referring to the zoom level of the output image (when it is not provided, the algorithm will automatically compute and use the minimum zoom level necessary)
+
+* __include_boundary__ (optional): a boolean variable flagging whether to include the boundary or not. When __include_boundary__ is set to False, the images produced may not capture the boundaries set as the leftover space is too small. When __include_boundary__ is set to True, the images produced will capture the entire area within boundaries but may go overbound. (default: False)
 
 ## Basic Ideas
 
